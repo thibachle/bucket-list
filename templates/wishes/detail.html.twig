@@ -2,5 +2,15 @@
 
 {% block body %}
     <h1>Détail un wish</h1>
+    <div class="bucket-details">
+        <h2>{{ wish.title}}</h2>
+        <div class="bucket-details-infos">
+            <div><i>Created  by {{ wish.author }}  on  {{ wish.dateCreated | date('Y-m-d') }}
+                    and updated on {{ wish.dateUpdated | date ('Y-m-d') }}</i></div>
+            <div>Published : {{ wish.published}}</div>
+            <div>Description {{ wish.description | nl2br }}</div>
+        </div>
+
+    </div>
 {% endblock %}
 
