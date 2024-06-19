@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Category;
 use App\Entity\Wish;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -11,28 +12,42 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        $this->addWishes(50,$manager);
-
+        $this->addCategories($manager);
+        $this->addWishes($manager);
     }
 
-    public function addWishes(int $number, ObjectManager $manager)
+
+    private function addCategories(ObjectManager $manager){
+        $categories = ['Travel & Adventure', 'Sport', 'Entertainment', 'Human Relations', 'Others'];
+
+        foreach ($categories as $category){
+            $cat = new Category();
+            $cat->setName($category);
+            $manager->persist($cat);
+        }
+        $manager->flush();
+    }
+
+    private function addWishes(ObjectManager $manager)
     {
+        //accès à un repository depuis l'entitymanager
+        $categories = $manager->getRepository(Category::class)->findAll();
+
         $faker = Factory::create('fr_FR');
 
-        for($i = 0 ; $i < $number; $i++){
+        for ($i = 0; $i < 50; $i++) {
             $wish = new Wish();
             $wish
-                ->setTitle($faker->realText(50))
-                ->setAuthor($faker->firstName)
-                ->setPublished($faker->boolean(60)) //60% true
                 ->setDescription($faker->realText(1000))
+                ->setAuthor($faker->firstName)
+                ->setTitle($faker->realText(50))
+                ->setPublished($faker->boolean(60))
                 ->setDateCreated($faker->dateTimeBetween("-2 year"))
-                ->setDateUpdated($faker->dateTimeBetween());
+                ->setCategory($faker->randomElement($categories));
 
             $manager->persist($wish);
         }
-
         $manager->flush();
     }
-}
 
+}

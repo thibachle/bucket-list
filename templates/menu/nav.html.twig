@@ -1,7 +1,19 @@
 <nav>
     <ul>
         <li><a href="{{ path('main_home') }}">Home</a></li>
-        <li><a href="{{ path('wishes_list') }}">All wishes</a></li>
         <li><a href="{{ path('main_about-us') }}">About us</a></li>
+        <li><a href="{{ path('wishes_list') }}">All wishes</a></li>
+        {% if app.user %}
+            <li><a href="{{ path('wishes_create') }}">Create un wish</a></li>
+            <li><a href="{{ path('app_logout') }}">Sign out ({{ app.user.usename }})</a></li>
+
+            {% if is_granted('ROLE_ADMIN') %}
+                <li><a href="{{ path('admin_dashboard') }}">Dashboard</a></li>
+            {% endif %}
+
+        {% else %}
+            <li><a href="{{ path('app_login') }}">Sign in</a></li>
+            <li><a href="{{ path('app_register') }}">Register</a></li>
+        {% endif %}
     </ul>
 </nav>

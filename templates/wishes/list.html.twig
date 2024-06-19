@@ -7,7 +7,7 @@
             <article>
                 <a href="{{ path('wishes_detail', {'id': wish.id }) }}">
                     <ul>
-                        <li> {{ wish.title  }}</li>
+                        <li> {{ wish.title  }} - {{ wish.category.name }}</li>
                     </ul>
                 </a>
             </article>

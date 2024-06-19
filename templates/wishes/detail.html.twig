@@ -6,9 +6,16 @@
         <h2>{{ wish.title}}</h2>
         <div class="bucket-details-infos">
             <div><i>Created  by {{ wish.author }}  on  {{ wish.dateCreated | date('Y-m-d') }}
-                    and updated on {{ wish.dateUpdated | date ('Y-m-d') }}</i></div>
+                    and updated on {{ wish.dateUpdated | date ('Y-m-d') }} - {{ wish.category }}</i></div>
             <div>Published : {{ wish.published}}</div>
             <div>Description {{ wish.description | nl2br }}</div>
+
+        </div>
+
+        <div>
+            <a class="button" href="{{ path('wishes_update', {'id':wish.id}) }}">Modifier</a>
+            <a class="button" href="{{ path('wishes_delete', {'id':wish.id}) }}">Delete</a>
+
         </div>
 
     </div>

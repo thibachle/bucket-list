@@ -3,14 +3,19 @@
 namespace App\Controller;
 
 use App\Entity\Wish;
+use App\Form\WishType;
 use App\Repository\WishRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 #[Route('/wishes', name: 'wishes_')]
 class WishController extends AbstractController
 {
-    #[Route('/list', name: 'list')]
+
+    #[Route('/list', name: "list_home")]
+    #[Route('', name: 'list')]
     public function list(WishRepository $wishRepository): Response
     {
         //tip 1: find all but not order
@@ -38,6 +43,64 @@ class WishController extends AbstractController
             "wish" =>$wish
         ]);
     }
+
+    #[Route('/create', name: 'create')]
+    #[Route('/update/{id}', name: 'update')]
+    public function create(
+        EntityManagerInterface $entityManager,
+        Request $request,
+        WishRepository $wishRepository,
+        int $id = null): Response
+    {
+
+        if($id){
+            $wish = $wishRepository->find($id);
+        }else{
+            $wish = new Wish();
+            $wish->setPublished(true);
+            $wish->setDateUpdated(new  \DateTime());
+        }
+
+        $wishForm = $this->createForm(WishType::class, $wish);
+        $wishForm->handleRequest($request);
+
+
+        if($wishForm->isSubmitted() && $wishForm->isValid()){
+            dump($wish);
+            $entityManager->persist($wish);
+            $entityManager->flush();
+
+            //je set les éléments non gérables par l'uitilisateur
+
+
+            $this->addFlash('success', 'Ideal is successfully added !');
+
+            return $this->redirectToRoute('wishes_detail', ['id' => $wish->getId()]);
+        }
+
+
+        return $this->render('wishes/create.html.twig', [
+            'wishForm' => $wishForm
+        ]);
+    }
+
+    #[Route('/delete/{id}', name: 'delete', requirements: ['id' => '\d+'])]
+    public function delete(int $id, WishRepository $wishRepository, EntityManagerInterface $entityManager): Response
+    {
+        $wish = $wishRepository->find($id);
+        if($this->getUser() != $wish->getUser() && !$this->isGranted('ROLE_ADMIN')){
+            throw $this->createNotFoundException('Not allow');
+        }
+
+        $entityManager->remove($wish);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Wish is deleted !');
+        return  $this->redirectToRoute('wishes_list');
+    }
+
+
+
 
 
 
