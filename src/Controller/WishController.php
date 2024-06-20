@@ -5,11 +5,14 @@ namespace App\Controller;
 use App\Entity\Wish;
 use App\Form\WishType;
 use App\Repository\WishRepository;
+use App\Services\Censurator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
+
 #[Route('/wishes', name: 'wishes_')]
 class WishController extends AbstractController
 {
@@ -50,7 +53,10 @@ class WishController extends AbstractController
         EntityManagerInterface $entityManager,
         Request $request,
         WishRepository $wishRepository,
-        int $id = null): Response
+        int $id = null,
+        Censurator $censurator
+    ): Response
+
     {
 
         if($id){
@@ -67,6 +73,10 @@ class WishController extends AbstractController
 
         if($wishForm->isSubmitted() && $wishForm->isValid()){
             dump($wish);
+            //utilisateur du service pour censurator
+            $wish->setDescription($censurator->purify($wish->getDescription()));
+            $wish->setTitle($censurator->purify($wish->getTitle()));
+
             $entityManager->persist($wish);
             $entityManager->flush();
 
