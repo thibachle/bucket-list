@@ -3,6 +3,7 @@
         <li><a href="{{ path('main_home') }}">Home</a></li>
         <li><a href="{{ path('main_about-us') }}">About us</a></li>
         <li><a href="{{ path('wishes_list') }}">All wishes</a></li>
+        <li><a href="{{ path('event_list') }}">Events</a></li>
         {% if app.user %}
             <li><a href="{{ path('wishes_create') }}">Create un wish</a></li>
             <li><a href="{{ path('app_logout') }}">Sign out ({{ app.user.usename }})</a></li>
